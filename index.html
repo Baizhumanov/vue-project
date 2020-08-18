@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+	<script src="https://kit.fontawesome.com/2f6a4744ac.js" crossorigin="anonymous"></script>
+
+	<title>Vue project</title>
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600|Roboto Mono&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="colors.css">
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="components.js"></script>
+</head>
+<body>
+	<header>
+		<a href="" id="main-link">Vue - project</a>
+		<div id="nav">
+			<nav><a href="manage/index.html">Управление</a></nav>
+			<nav><a href="additional/index.html">Дополнительное</a></nav>
+		</div>
+	</header>
+	<div class="container">
+		<div class="row py-5">
+			<div class="col-8 shadow rounded py-4 mx-4" id="main">
+				<table class="table">
+					<thead class="thead-dark">
+						<tr>
+							<th style="width: 10%;"></th>
+							<th class="text-center">ID</th>
+							<th>Слово</th>
+							<th>Перевод</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							v-for="word in words"
+							:key="word.id"
+							:class="{active : word.active}">
+							<td class="text-center">
+								<i class="far fa-check-circle"
+									@click="select(word.id)"></i>
+							</td>
+							<td class="text-center">{{ word.id }}</td>
+							<td>{{ word.word }}</td>
+							<td>{{ word.translate }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-3 shadow rounded p-4 mx-3 fixed" id="sticky-sidebar">
+				<div class="sticky-top">
+					<div class="nav flex-column">
+						<nav-link text="Добавить" link="add/index.html" class="btn-primary"></nav-link>
+						<nav-link text="Изменить" link="update/index.html" class="btn-primary"></nav-link>
+						<nav-button text="Удалить" @delete-word="deleteWord" class="btn-danger"></nav-button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var main = new Vue({
+			el: '#main',
+			data: {
+				words: [],
+				activeId: ''
+			},
+			mounted() {
+				if (localStorage.getItem("active")) {
+					this.activeId = localStorage.getItem("active");
+				}
+				for (let i=0; i < localStorage.length; i++) {
+					let key = localStorage.key(i);
+					if (key === "active") { continue; }
+					let values = localStorage.getItem(key).split('+');
+					let isActive = key === this.activeId ? true : false;
+
+					this.words.push({
+						id: key,
+						word: values[0],
+						translate: values[1],
+						active: isActive
+					});
+				}
+				this.words.sort((prev, next) => prev.id - next.id);
+			},
+			methods: {
+				select: function(id) {
+					if (id === this.activeId) {
+						// убрать класс active
+						this.clearId(id);
+						
+						// убрать с localStorage
+						localStorage.setItem("active", '');
+
+						// убрать с activeid
+						this.activeId = '';
+
+						console.log('сработал if');
+					} else {
+						/// должна вызываться функция очистки старой id
+						this.clearId(this.activeId);
+
+						// добавить в лс
+						localStorage.setItem("active", id);
+
+						// добавить activeId
+						this.activeId = id;
+
+						// добавить класс active
+						for (let i=0; i < this.words.length; i++) {
+							if (this.words[i].id == id) {
+								this.words[i].active = true;
+								break;
+							}
+						}
+						console.log('сработал else');
+					}
+				},
+				clearId: function(id) {
+					// функция, чтобы убрать класс active у опр элемента
+					for (let i=0; i < this.words.length; i++) {
+						if (this.words[i].id == id) {
+							this.words[i].active = false;
+							break;
+						}
+					}
+				}
+			}
+		})
+
+		var sidebar = new Vue({
+			el: '#sticky-sidebar',
+			data: {},
+			methods: {
+				deleteWord: function() {
+					
+					// если есть слово
+					if (localStorage.getItem("active")) {
+						id = localStorage.getItem("active");
+						values = localStorage.getItem(id).split('+');
+						result = confirm("Вы действительно хотите удалить слово - " + values[0] + "?");
+
+						if (result) {
+							localStorage.removeItem(id);
+							// удаление с массива words
+							console.log(id);
+							for (let i=0; i < main.words.length; i++) {
+								if (main.words[i].id == id) {
+									main.words.splice(i, 1);
+									break;
+								}
+							}
+						}
+					} 
+				}
+			}
+		})
+	</script>
+  </body>
+</body>
+</html>

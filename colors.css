@@ -1,0 +1,26 @@
+.btn-primary {
+	background-color: #083358;
+	border-color: #083358;
+	color: white;
+}
+
+.btn-primary:hover { background-color: #0A4576; }
+
+.btn-danger {
+	background-color: #FF4057
+	border-color: #FF4057
+}
+
+
+.table .thead-dark th {	background-color: #083358; }
+td i { color: #083358; }
+
+.active i {
+	transition: 0.3s;
+	color: #F67280;
+}
+
+.active {
+	transition: 0.3s;
+	background-color: #F67280;
+}

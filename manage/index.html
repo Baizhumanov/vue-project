@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600|Roboto Mono&display=swap" rel="stylesheet">
+	<script src="https://kit.fontawesome.com/2f6a4744ac.js" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="../style.css">
+	<link rel="stylesheet" href="../colors.css">
+	<title>Vue project</title>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="../components.js"></script>
+</head>
+<body>
+	<custom-header id="header" :link="mainLink"></custom-header>
+	<div class="container">
+		<div class="row shadow rounded py-4 mt-3 justify-content-around">
+			<div class="col-5" id="sort">
+				<span class="label">Сортировка:</span><br>
+				<div class="btn-group btn-group-toggle" data-toggle="buttons">
+					<label class="btn btn-secondary active">
+						<input @click="sort('id')" type="radio" name="options" checked>по id
+					</label>
+					<label class="btn btn-secondary">
+						<input @click="sort('word')" type="radio" name="options">по слову
+					</label>
+					<label class="btn btn-secondary">
+						<input @click="sort('translate')" type="radio" name="options">по переводу
+					</label>
+				</div>
+			</div>
+			<div class="col-5" id="search">
+				<div class="col d-flex justify-content-between">
+					<custom-input v-model.trim="searchText" :label="label"></custom-input>
+					<div class="btn-group btn-group-toggle align-self-center" data-toggle="buttons">
+						<label class="btn btn-secondary active">
+							<input @click="toggle('word')" type="radio" name="options" checked>по слову
+						</label>
+						<label class="btn btn-secondary">
+							<input @click="toggle('translate')" type="radio" name="options">по переводу
+						</label>
+					</div>
+				</div>
+				
+				<submit-button class="mx-3 mt-1" button-text="Поиск" @set-word="search"></submit-button>
+			</div>
+		</div>
+		<div class="row py-5">
+			<div class="col shadow rounded py-4 mx-4" id="main">
+				<table class="table">
+					<thead class="thead-dark">
+						<tr>
+							<th style="width: 10%;"></th>
+							<th class="text-center">ID</th>
+							<th>Слово</th>
+							<th>Перевод</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							v-for="word in words"
+							:key="word.id"
+							:class="{active : word.active}">
+							<td class="text-center">
+								<i class="far fa-check-circle"
+									@click="select(word.id)"></i>
+							</td>
+							<td class="text-center">{{ word.id }}</td>
+							<td>{{ word.word }}</td>
+							<td>{{ word.translate }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var main = new Vue({
+			el: '#main',
+			data: {
+				words: [],
+				activeId: ''
+			},
+			mounted() {
+				this.setWords();
+			},
+			methods: {
+				select: function(id) {
+					if (id === this.activeId) {
+						// убрать класс active
+						this.clearId(id);
+						
+						// убрать с localStorage
+						localStorage.setItem("active", '');
+
+						// убрать с activeid
+						this.activeId = '';
+
+						console.log('сработал if');
+					} else {
+						/// должна вызываться функция очистки старой id
+						this.clearId(this.activeId);
+
+						// добавить в лс
+						localStorage.setItem("active", id);
+
+						// добавить activeId
+						this.activeId = id;
+
+						// добавить класс active
+						for (let i=0; i < this.words.length; i++) {
+							if (this.words[i].id == id) {
+								this.words[i].active = true;
+								break;
+							}
+						}
+						console.log('сработал else');
+					}
+				},
+				clearId: function(id) {
+					// функция, чтобы убрать класс active у опр элемента
+					for (let i=0; i < this.words.length; i++) {
+						if (this.words[i].id == id) {
+							this.words[i].active = false;
+							break;
+						}
+					}
+				},
+				setWords: function() {
+					this.words = [];
+					if (localStorage.getItem("active")) {
+						this.activeId = localStorage.getItem("active");
+					}
+					for (let i=0; i < localStorage.length; i++) {
+						let key = localStorage.key(i);
+						if (key === "active") { continue; }
+						let values = localStorage.getItem(key).split('+');
+						let isActive = key === this.activeId ? true : false;
+
+						this.words.push({
+							id: key,
+							word: values[0],
+							translate: values[1],
+							active: isActive
+						});
+					}
+					this.words.sort((prev, next) => prev.id - next.id);
+				}
+			}
+		})
+
+		new Vue({
+			el: '#header',
+			data: {	mainLink: '../index.html' }
+		})
+
+		new Vue({
+			el: '#search',
+			data: {
+				searchText: '',
+				filter: 'word'
+			},
+			methods: {
+				toggle: function(value) {
+					this.filter = value
+				},
+				search: function() {
+					main.setWords();
+					var pattern = new RegExp(this.searchText);
+					if (this.filter == 'word') {
+						main.words = main.words.filter(function (word) {
+							return word.word.match(pattern)
+						})
+					} else {
+						main.words = main.words.filter(function (word) {
+							return word.translate.match(pattern)
+						})
+					}
+				}
+			},
+			computed: {
+				label: function() {
+					return this.filter == 'word' ? "Поиск по слову" : "Поиск по переводу"
+				}
+			}
+		})
+
+		new Vue({
+			el: '#sort',
+			methods: {
+				sort: function(value) {
+					switch(value) {
+						case 'id':
+							main.words.sort((prev, next) => prev.id - next.id);
+							break;
+						case 'word':
+							main.words.sort((prev, next) => {
+								if ( prev.word < next.word ) return -1;
+								if ( prev.word < next.word ) return 1;
+							});
+							break;
+						case 'translate':
+							main.words.sort((prev, next) => {
+								if ( prev.translate < next.translate ) return -1;
+								if ( prev.translate < next.translate ) return 1;
+							});
+							break;
+					}
+				}
+			}
+		})
+	</script>
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</body>
+</html>

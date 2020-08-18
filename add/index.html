@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600|Roboto Mono&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../style.css">
+	<link rel="stylesheet" href="../form.css">
+	<link rel="stylesheet" href="../colors.css">
+
+	<title>Vue project</title>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="../components.js"></script>
+</head>
+<body>
+	<custom-header id="header" :link="mainLink"></custom-header>
+	<main class="container" id="main">
+		<custom-form>
+			<custom-input :label="wordLabel" v-model.trim="word"></custom-input>
+			<custom-input :label="translateLabel" v-model.trim="translate"></custom-input>
+			<submit-button :button-text="buttonText" @set-word="addWord"></submit-button>
+		</custom-form>
+	</main>
+
+	<script>
+		new Vue({
+			el: '#header',
+			data: {
+				mainLink: '../index.html'
+			}
+		})
+
+		var form = new Vue({
+			el: '#main',
+			data: {
+				buttonText: 'Добавить',
+				wordLabel: 'Слово',
+				word: '',
+				translateLabel: 'Перевод',
+				translate: ''
+			},
+			methods: {
+				addWord: function() {
+					// проверка - нету ли похожего (это в другой метод)
+					// добавление
+					key = localStorage.length + 1;
+					value = this.word + "+" + this.translate;
+					localStorage.setItem(key, value);
+					location.assign("../index.html");
+				}
+			}
+		})
+	</script>
+	<!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script> -->
+</body>
+</html>

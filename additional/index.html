@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600|Roboto Mono&display=swap" rel="stylesheet">
+	<script src="https://kit.fontawesome.com/2f6a4744ac.js" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="../style.css">
+	<link rel="stylesheet" href="../colors.css">
+	<title>Vue project</title>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="../components.js"></script>
+</head>
+<body>
+	<custom-header id="header" :link="mainLink"></custom-header>
+	<div class="container">
+		<div class="row" id="main">
+			<div class="col shadow rounded my-3 py-4 text-center">
+				<h2>Очистить весь список</h2><br>
+				<button class="btn btn-danger">Очистить словарь</button>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		new Vue({
+			el: '#header',
+			data: {	mainLink: '../index.html' }
+		})
+
+		var main = new Vue({
+			el: '#main',
+			methods: {
+				clear: function() {
+					result = confirm("Вы действительно хотите очистить словарь?");
+
+					if (result) {
+						localStorage.clear();
+						location.assign("../index.html");
+					}
+				}
+			}
+		})
+	</script>
+</body>
+</html>

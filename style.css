@@ -1,0 +1,54 @@
+body {
+	padding: 0;
+	margin: 0;
+	font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+	color: #304455;
+}
+
+header {
+	height: 60px;
+	padding: 10px 60px;
+	box-shadow: 0 0 1px rgba(0,0,0,0.25);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 1.1em;
+}
+
+#main-link {
+	display: block;
+	text-decoration: none;
+	color: #304455;
+	font-weight: 600;
+	font-size: 1.2em;
+}
+
+#nav {
+	list-style-type: none;
+	display: flex;
+}
+
+#nav nav {
+	display: block;
+	margin: 0 30px;
+}
+
+.table {font-size: 1.3em;}
+.far {font-size: 1.4em;cursor: pointer;}
+
+#sticky-sidebar {
+	position: fixed;
+	top: 110px;
+	right: 25px;
+}
+
+.theme {
+	width: 100%;
+	height: 200px;
+	margin-bottom: 20px;
+}
+
+.label {
+	font-weight: 600;
+	font-size: 1.2em;
+}
